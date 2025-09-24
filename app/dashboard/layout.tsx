@@ -1,4 +1,7 @@
 import SideNav from "@/app/ui/dashboard/sidenav"
+// adopt pre-rendering for specific route
+//Next.js will prerender the static parts of your route and defer the dynamic parts until the user requests them
+export const experimental_ppr = true //this improve performance in production
 
 type LayoutProps = {
     children : React.ReactNode
