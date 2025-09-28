@@ -4,13 +4,20 @@ import { revalidatePath } from 'next/cache';
 import postgres from 'postgres';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require'});
 import { redirect } from 'next/navigation';
+import { validateHeaderName } from 'http';
+
+
 
 // Zod Schema define the struncture of the invoice
 const FormSchema = z.object({
     id: z.string(),
-    customerId: z.string(),
-    amount: z.coerce.number(),
-    status: z.enum(['pending', 'paid']),
+    customerId: z.string({
+        invalid_type_error: 'Please select a customer.'
+    }),
+    amount: z.coerce.number().gt(0, {message: 'Please Enter an amount greater than $0.'}),
+    status: z.enum(['pending', 'paid'], {
+        invalid_type_error: 'Please select an invoice status'
+    }),
     date: z.string()
 });
 
@@ -37,13 +44,21 @@ export async function deleteInvoice(id: string, formData: FormData){
 }
 
 
-export async function updateInvoice( id: string, formData: FormData ){
-    const {customerId, amount, status} = UpdateInvoice.parse({
+export async function updateInvoice( id: string, prevState: State, formData: FormData ){
+    const validatedFields = UpdateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
 
+    if(!validatedFields.success){
+        return{
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing fields. Failed to update the  Invoice.'
+        };
+    }
+
+    const {customerId, amount, status} = validatedFields.data;
     const amountInCents = amount * 100;
     
     try{
@@ -62,16 +77,40 @@ export async function updateInvoice( id: string, formData: FormData ){
     redirect('/dashboard/invoices');
 }
 
+// updated createInvoice action to accept two parameters - prevState and formData
 
+export type State = {
+    errors?: {
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
 
-export async function createInvoice(formData : FormData){
+    }
+    message?: string | null;
+};
 
-    const {customerId, amount, status} = CreateInvoice.parse({
+// prevState - contains the state passed from the useActionState hook. 
+// You won't be using it in the action in this example, 
+// but it's a required prop.
+
+export async function createInvoice( prevState: State , formData : FormData){
+    // Valiiidate form using Zod
+    const validatedFields = CreateInvoice.safeParse({
+        // safeParse() will return an object containing either a success or error field
 
         customerId : formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status')
     });
+    if(!validatedFields.success){
+        return{
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields. Failed to create Invoice.',
+        };
+    }
+    // prepare data for insertion into the database
+    const {customerId, amount, status} = validatedFields.data;
+
     const amountInCents = amount * 100
     const date = new Date().toISOString().split('T')[0];
 
