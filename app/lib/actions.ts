@@ -5,6 +5,9 @@ import postgres from 'postgres';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require'});
 import { redirect } from 'next/navigation';
 import { validateHeaderName } from 'http';
+import { signIn } from '@/auth'
+import { AuthError } from 'next-auth';
+import { deflate } from 'zlib';
 
 
 
@@ -134,3 +137,21 @@ export async function createInvoice( prevState: State , formData : FormData){
     redirect('/dashboard/invoices')
 }
 
+export async function authenticate(
+    prevState: string | undefined,
+    formData: FormData,
+){
+    try{
+        await signIn('credentials', formData);
+    }catch(error){
+        if(error instanceof AuthError){
+            switch (error.type){
+                case 'CredentialsSignin':
+                    return 'Invalid Credentials.'
+                default:
+                    return 'Something Went Wrong!'
+            }
+        }
+        throw error;
+    }
+}
