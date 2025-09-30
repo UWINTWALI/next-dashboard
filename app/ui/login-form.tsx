@@ -7,10 +7,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
-import { useActionState } from 'react';
+import { useActionState, useReducer } from 'react';
 import { authenticate } from '../lib/actions';
 import { useSearchParams } from 'next/navigation';
 import { Metadata } from 'next';
+import { LoadingButton } from '@/app/ui/loadingbutton';
+import { useRouter } from 'next/navigation';
 
 
 export const metadata: Metadata ={
@@ -19,6 +21,7 @@ export const metadata: Metadata ={
 
 
 export default function LoginForm() {
+  const router = useRouter()
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [errorMessage, formAction, isPending] = useActionState(
@@ -75,10 +78,15 @@ export default function LoginForm() {
         </div>
 
         <input type='hidden' name='redirectTo' value={callbackUrl} />
-        <Button className="mt-4 w-full" aria-disabled={isPending} >
-          Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
-        </Button>
-
+          {/* Loading button */}
+        <LoadingButton
+          label="Log in"
+          icon={<ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />}
+          className="mt-4 w-full items-center justify-between bg-bg-surface text-white"
+          loading={isPending}
+          onClick={() => {}} // since form handles submission
+        />
+       
         <div className="flex h-8 items-end space-x-1"
         aria-live='polite'
         aria-atomic='true'
