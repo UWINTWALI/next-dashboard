@@ -44,6 +44,7 @@ export async function deleteInvoice(id: string, formData: FormData){
     }
     // trigger new server request and re-render the table
     revalidatePath('/dashboard/invoices')
+    revalidatePath('/dashboard'); // re-fetch everything, including score cards
 }
 
 
