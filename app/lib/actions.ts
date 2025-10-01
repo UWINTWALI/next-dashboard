@@ -78,6 +78,7 @@ export async function updateInvoice( id: string, prevState: State, formData: For
         }
     }
     revalidatePath('/dashboard/invoices');
+    revalidatePath('/dashboard');
     redirect('/dashboard/invoices');
 }
 
@@ -135,7 +136,9 @@ export async function createInvoice( prevState: State , formData : FormData){
     // console.log( typeof customerId)
     // console.log( typeof amount)
     revalidatePath('/dashboard/invoices') // Clears the cache for /dashboard/invoices. Tells Next.js: “Next time someone visits or navigates here, fetch fresh data
+    revalidatePath('/dashboard');
     redirect('/dashboard/invoices')
+
 }
 
 export async function authenticate(
