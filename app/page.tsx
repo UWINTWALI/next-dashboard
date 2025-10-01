@@ -38,7 +38,7 @@ export default function Page() {
           {/* Container fixes button shifting */}
           <div className="h-48 md:h-64">
             <p
-              className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}
+              className={`${lusitana.className} text-xl text-gray-800 md:text-xl md:leading-normal`}
             >
               {beforeBold}
               <strong>{bold}</strong>

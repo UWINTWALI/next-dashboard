@@ -5,15 +5,20 @@ import {
   CheckIcon,
   ClockIcon,
   CurrencyDollarIcon,
+  PlusIcon,
+  XMarkIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import { createInvoice, State } from '@/app/lib/actions';
 import { useActionState } from 'react'
+import { SubmitProcessingButton } from '@/app/ui/process-submission';
+// import { useRouter } from 'next/navigation';
 // import { error } from 'console';
 
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
+
   const initialState: State = {message: null, errors:{}};
   const [state, formAction ] =  useActionState(createInvoice, initialState);
   return (
@@ -145,8 +150,14 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
+          <XMarkIcon className='w-5' />       
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <SubmitProcessingButton
+        label='Create Invoicee'
+        className="flex h-10 items-center rounded-lg bg-bg-surface px-4 text-sm font-medium text-white transition-colors hover:bg-gray-500"
+        icon={<PlusIcon className='w-5' />}
+        />
+        {/* <Button type="submit">Create Invoice</Button> */}
       </div>
     </form>
   );
